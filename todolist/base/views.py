@@ -1,3 +1,4 @@
+from django.forms.models import BaseModelForm
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic.list import ListView
@@ -23,6 +24,14 @@ class TaskList(LoginRequiredMixin, ListView):
     template_name = 'task_list.html'
     context_object_name = 'tasks'
 
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tasks'] = context['tasks'].filter(user=self.request.user)
+        context['count'] = context['tasks'].filter(complete = False)
+        return context
+    
+
 class TaskDetail(LoginRequiredMixin, DetailView):
     model = Task
     context_object_name = 'task'
@@ -30,13 +39,17 @@ class TaskDetail(LoginRequiredMixin, DetailView):
 
 class TaskCreate(LoginRequiredMixin, CreateView):
     model = Task
-    fields = "__all__"
+    fields = ['title','description','complete']
     template_name = 'base/task_form.html'
     success_url = reverse_lazy('tasks')
 
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
 class TaskUpdate(LoginRequiredMixin, UpdateView):
     model = Task
-    fields = "__all__"
+    fields = ['title','description','complete']
     template_name = 'base/task_form.html'
     success_url = reverse_lazy('tasks')
 
