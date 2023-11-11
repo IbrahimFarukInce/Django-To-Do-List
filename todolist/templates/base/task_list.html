@@ -4,10 +4,15 @@
     <tr>
         <th>Item</th>
     </tr>
-    
-    {% for task in object_list %}
+    <tr>
+        <td><a href="{% url 'task-create' %}">Add Task</a></td>
+    </tr>
+    {% for task in tasks %}
     <tr>
         <td>{{task.title}}</td>
+        <td><a href="{% url 'task-update' task.pk %}">view</a></td>
+        <td><a href="{% url 'task-update' task.pk %}">edit</a></td>
+        <td><a href="{% url 'task-delete' task.pk %}">delete</a></td>
     </tr>
     {% empty %}
     <h3>No items in list</h3>
